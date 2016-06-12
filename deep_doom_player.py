@@ -28,7 +28,7 @@ import os
 import random
 from collections import deque
 
-from basic_qlerntesorflow_one_frame import DeepQDoomPlayer
+from deep_doom import DeepDoom
 
 
 import tensorflow as tf
@@ -45,55 +45,49 @@ skiprate = 7
 
 
 
-class DeepDoomPlayer(DeepQDoomPlayer):
+class DeepDoomPlayer(DeepDoom):
 
-    
-      
-    
     def __init__ (self):
         
-        # set scroe on start to 0
+        # set scroe on play to 0
         self.last_score = 0
         
         #get tensorflow session, set up network
-        self._session = tf.Session()
-        self._input_layer, self._output_layer = self._create_network()
+        self.session = tf.Session()
+        self.input_layer, self.output_layer = self.create_network()
         
-        self._action = tf.placeholder("float", [None, self.ACTIONS_COUNT])
-        self._target = tf.placeholder("float", [None])
-
-        readout_action = tf.reduce_sum(tf.mul(self._output_layer, self._action), reduction_indices=1)
-
-        cost = tf.reduce_mean(tf.square(self._target - readout_action))
-        self._train_operation = tf.train.AdamOptimizer(self.LEARN_RATE).minimize(cost)
-
+        self.action = tf.placeholder("float", [None, self.num_of_possible_actions])
+        self.target = tf.placeholder("float", [None])
 
         # deque https://pymotw.com/2/collections/deque.html
-        self._observations = deque()
-        self._last_scores = deque()
-        
-        
+        self.observations = deque()
+        self.last_scores = deque()
+       
          # set the first action to do nothing
-        self._last_action = np.zeros(self.ACTIONS_COUNT)
-        self._last_action[1] = 1
+        self.last_action = np.zeros(self.num_of_possible_actions)
+        self.last_action[1] = 1
 
-        self._last_state = None
-        self._probability_of_random_action = self.INITIAL_RANDOM_ACTION_PROB
-        self._time = 0
+        self.last_state = None
+       
+        self.time = 0
 
-        #start the deep learning network 
-        self._session.run(tf.initialize_all_variables())
-        self._saver = tf.train.Saver()
-        checkpoint = tf.train.get_checkpoint_state(self.checkpoint_path)
+        #play the deep learning network 
+        self.session.run(tf.initialize_all_variables())
+        self.saver = tf.train.Saver()
+        
+               
+        checkpoint = tf.train.get_checkpoint_state("/home/sven/checkpoint/")
+       
+        if checkpoint and checkpoint.model_checkpoint_path:
+            self.saver.restore(self.session, checkpoint.model_checkpoint_path)
+            print("Loaded checkpoints %s" % checkpoint.model_checkpoint_path)
+        else:
+            print("Could not load any checkpoint exit now")
+            sys.exit(0)
         
         
-        self._saver.restore(self._session, checkpoint.model_checkpoint_path)
-        print("Loaded checkpoints %s" % checkpoint.model_checkpoint_path)
         
-        
-        
-    
-    def start(self):
+    def play(self):
         
         # Create DoomGame instance. It will run the game and communicate with you.
         print ("Initializing doom...")
@@ -138,14 +132,14 @@ class DeepDoomPlayer(DeepQDoomPlayer):
 
                 
                 # first frame must be handled differently
-                if self._last_state is None:
+                if self.last_state is None:
                     #print ("ich bin hier")
-                    # the _last_state will contain the image data from the last self.STATE_FRAMES frames
-                    self._last_state = np.stack(tuple(self.convert_image(game.get_state().image_buffer) for _ in range(self.STATE_FRAMES)), axis=2)
+                    # the _last_state will contain the image data from the last self.state_frames frames
+                    self.last_state = np.stack(tuple(self.convert_image(game.get_state().image_buffer) for _ in range(self.state_frames)), axis=2)
                     continue
 
                 
-                reward = game.make_action(DeepDoomPlayer._key_presses_from_action(self._last_action), 7)
+                reward = game.make_action(DeepDoomPlayer.define_keys_to_action_pressed(self.last_action), 7)
            
                 
                 reward *= 0.01
@@ -166,11 +160,11 @@ class DeepDoomPlayer(DeepQDoomPlayer):
                 # add dimension
                 screen_resized_binary = np.expand_dims(screen_resized_binary, axis=2)
 
-                current_state = np.append(self._last_state[:, :, 1:], screen_resized_binary, axis=2)
+                current_state = np.append(self.last_state[:, :, 1:], screen_resized_binary, axis=2)
 
-                self._last_state = current_state
+                self.last_state = current_state
 
-                self._last_action = self._choose_next_action_only_onq()
+                self.last_action = self.choose_next_action_only_on_q()
 
             print (train_episodes_finished, "training episodes played.")
             print ("Training results:")
@@ -195,7 +189,7 @@ if __name__ == '__main__':
     # playback_mode="True"
     
     player = DeepDoomPlayer()
-    player.start()
+    player.play()
 
 
 
