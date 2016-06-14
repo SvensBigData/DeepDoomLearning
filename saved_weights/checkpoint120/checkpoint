@@ -1,0 +1,6 @@
+model_checkpoint_path: "/home/sven/checkpoint/checkpoint120/-120"
+all_model_checkpoint_paths: "/home/sven/checkpoint/checkpoint80/-80"
+all_model_checkpoint_paths: "/home/sven/checkpoint/checkpoint90/-90"
+all_model_checkpoint_paths: "/home/sven/checkpoint/checkpoint100/-100"
+all_model_checkpoint_paths: "/home/sven/checkpoint/checkpoint110/-110"
+all_model_checkpoint_paths: "/home/sven/checkpoint/checkpoint120/-120"

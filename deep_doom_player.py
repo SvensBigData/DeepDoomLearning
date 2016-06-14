@@ -36,15 +36,6 @@ import numpy as np
 import cv2
 from Tkconstants import OFF
 
-#garbage
-terminal = False
-downsampled_x = 80
-downsampled_y = 80
-sleep_time = 0.028
-skiprate = 7
-
-
-
 class DeepDoomPlayer(DeepDoom):
 
     def __init__ (self):
@@ -138,7 +129,6 @@ class DeepDoomPlayer(DeepDoom):
                     self.last_state = np.stack(tuple(self.convert_image(game.get_state().image_buffer) for _ in range(self.state_frames)), axis=2)
                     continue
 
-                
                 reward = game.make_action(DeepDoomPlayer.define_keys_to_action_pressed(self.last_action), 7)
            
                 
@@ -175,19 +165,14 @@ class DeepDoomPlayer(DeepDoom):
 
 
             print ("mean:", train_rewards.mean(), "std:", train_rewards.std(), "max:", train_rewards.max(), "min:", train_rewards.min(),  "epsilon:", self._probability_of_random_action)
-           
-            
-            
-        
+
         # It will be done automatically anyway but sometimes you need to do it in the middle of the program...
         game.close()
         self._last_state = None
 
 
 if __name__ == '__main__':
-    # to see a trained network add the args checkpoint_path="deep_q_half_pong_networks_40x40_8" and
-    # playback_mode="True"
-    
+
     player = DeepDoomPlayer()
     player.play()
 
