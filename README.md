@@ -1,7 +1,7 @@
 # DeepDoomLearning
 
 This is an implementation of Deep Reinforcement Learning as proposed from DeepMind 
-(see: https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf.)
+(see: https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
 
 It is based on the ViZDoom (https://github.com/Marqt/ViZDoom) learning environment. The deep convolutional network is implemented in tensorflow (https://www.tensorflow.org/)
 
