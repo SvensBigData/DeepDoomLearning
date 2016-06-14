@@ -9,4 +9,4 @@ This proof of concept implementation, can serve as a starting point for further 
 
 For further learning more complex scenarios an addional layer should be added to the network.
 
-Caution: This is work in progress and needs some refactoring For this to work you need complied ViZDoom and Tensorflow.
+Caution: This is work in progress and needs some refactoring. For this to work you need ViZDoom and Tensorflow.
