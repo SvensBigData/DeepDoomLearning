@@ -113,7 +113,7 @@ class DeepDoom:
         # Create DoomGame instance. It will run the game and communicate with you.
         print ("Initializing doom...")
         game = DoomGame()
-        game.load_config("./examples/config/learningtensorflow.cfg")
+        game.load_config("./config/learningtensorflow.cfg")
         game.init()
         print ("Doom initialized.")
         

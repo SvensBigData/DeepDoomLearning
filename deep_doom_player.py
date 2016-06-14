@@ -1,13 +1,8 @@
 #!/usr/bin/python
 #####################################################################
-# This script presents how to use the most basic features of the environment.
-# It configures the engine, and makes the agent perform random actions.
-# It also gets current state and reward earned with the action.
-# <episodes> number of episodes are played. 
-# Random combination of buttons is chosen for every action.
-# Game variables from state and last reward are printed.
-# To see the scenario description go to "../../scenarios/README.md"
-# 
+#
+#  This is the deep doom playing class
+#  
 #####################################################################
 from __future__ import print_function
 from vizdoom import DoomGame
@@ -35,6 +30,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 from Tkconstants import OFF
+
 
 class DeepDoomPlayer(DeepDoom):
 
@@ -67,7 +63,7 @@ class DeepDoomPlayer(DeepDoom):
         self.saver = tf.train.Saver()
         
                
-        checkpoint = tf.train.get_checkpoint_state("/home/sven/checkpoint/")
+        checkpoint = tf.train.get_checkpoint_state(DeepDoom.checkpoint_path)
        
         if checkpoint and checkpoint.model_checkpoint_path:
             self.saver.restore(self.session, checkpoint.model_checkpoint_path)
@@ -84,11 +80,11 @@ class DeepDoomPlayer(DeepDoom):
         print ("Initializing doom...")
         game = DoomGame()
 
-        game.load_config("./examples/config/deepdoomplayer.cfg")
+        game.load_config("./config/deepdoomplayer.cfg")
         game.init()
         print ("Doom initialized.")
  
-        episodes = 100000000
+        episodes = 3
         training_steps_per_epoch = 100
 
         sleep_time = 0.100
@@ -101,16 +97,13 @@ class DeepDoomPlayer(DeepDoom):
             train_loss = []
             train_rewards = []
 
-
             train_start = time()
 
             game.new_episode()
         
-            for learning_step in tqdm(range(training_steps_per_epoch)):
+            for learning_step in range(training_steps_per_epoch):
         
-
                 sleep(sleep_time)   
-
 
                 if game.is_episode_finished():
                     #print("game is finished")
@@ -124,11 +117,10 @@ class DeepDoomPlayer(DeepDoom):
                 
                 # first frame must be handled differently
                 if self.last_state is None:
-                    #print ("ich bin hier")
-                    # the _last_state will contain the image data from the last self.state_frames frames
                     self.last_state = np.stack(tuple(self.convert_image(game.get_state().image_buffer) for _ in range(self.state_frames)), axis=2)
                     continue
 
+                
                 reward = game.make_action(DeepDoomPlayer.define_keys_to_action_pressed(self.last_action), 7)
            
                 
@@ -138,11 +130,8 @@ class DeepDoomPlayer(DeepDoom):
 
                 if imagebuffer is None:
                     terminal = True
-                    #print(reward)
                     screen_resized_binary =  np.zeros((40,40))
-                    
-                imagebufferlast = imagebuffer 
-                    
+
                 if imagebuffer is not None: 
                     terminal = False
                     screen_resized_binary = self.convert_image(imagebuffer)
@@ -161,10 +150,12 @@ class DeepDoomPlayer(DeepDoom):
 
             train_rewards = np.array(train_rewards)
           
-            mean_loss = np.mean(train_loss)
 
-
-            print ("mean:", train_rewards.mean(), "std:", train_rewards.std(), "max:", train_rewards.max(), "min:", train_rewards.min(),  "epsilon:", self._probability_of_random_action)
+            print ("mean:", train_rewards.mean(), 
+                   "std:", train_rewards.std(), 
+                   "max:", train_rewards.max(), 
+                   "min:", train_rewards.min())
+           
 
         # It will be done automatically anyway but sometimes you need to do it in the middle of the program...
         game.close()
@@ -172,15 +163,8 @@ class DeepDoomPlayer(DeepDoom):
 
 
 if __name__ == '__main__':
-
+    # to see a trained network add the args checkpoint_path="deep_q_half_pong_networks_40x40_8" and
+    # playback_mode="True"
+    
     player = DeepDoomPlayer()
     player.play()
-
-
-
-
-
-
-
-
-
