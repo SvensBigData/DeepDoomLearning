@@ -1,0 +1,47 @@
+My setup used Ubuntu 14.04 
+
+To run the Agent ViZDoom and TensorFlow must be installed.
+
+ViZDoom must be installed with python bindings enabled.
+Installation notes can be found here:
+https://github.com/Marqt/ViZDoom
+
+Also TensorFlow must be installed it both cpu and gpu can be used.
+For training the agent i strongly recommend the gpu version.
+Installation note for TensorFlow can be found here:
+https://www.tensorflow.org/versions/r0.8/get_started/os_setup.html
+
+node: I used tensorflow 0.8 newest version is 0.9.
+
+Additional to the requiered packages for ViZDoom and TensorFlow I also used OpenCV for Python:
+http://opencv-python-tutroals.readthedocs.io/en/latest/index.html
+with i had to install seperatly
+
+After everthing is installed the are two python file:
+1. deep_doom.py the learning agent
+2. deep_doom_player.py the playing agent with is a supclass from deep_doom.py
+
+The easyest way to use this agents is to put them under the ViZDoom folder under examples/python
+There are two config files deepdoomplayer.cfg and learningtensorflow.cfg put them under examples/config
+
+There is a additional saved checkpoint folder with have saved network weights for epoch 20,30 to 150.
+I put them in my home directory, in der deep_doom.py file there is the varialbe:
+checkpoint_path="/home/sven/checkpoint/new/"
+with is used for saving by the deep_doom.py and loading for the deep_doom_player.py.
+So to load a network set this pfad to one of the saved epoch folders. 
+In each of the epoched folder is also a file called "checkpoint"
+which should be opened with a text-editor and the value for "model_checkpoint_path" must be change to the used pfad.
+
+node: It is not necessary to change all checkpoint files, only the one which will be used.
+
+To run the files from commandline I then simple used:
+~/ViZDoom$ python examples/python/deep_doom.py or
+~/ViZDoom$ python examples/python/deep_doom_player.py
+
+You have to be in the ViZDoom home directory.
+
+
+
+
+
+
